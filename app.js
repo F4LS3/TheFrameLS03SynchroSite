@@ -92,6 +92,8 @@ io.sockets.on('connection', (socket) => {
             } else {
                 masterSocket = null;
             }
+        } else {
+            frames.splice(frames.indexOf(socket), 1);
         }
     });
 });
