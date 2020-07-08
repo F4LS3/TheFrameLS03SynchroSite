@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head style="margin: 0; padding: 0;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TheFrame LS03 SynchroSite</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+</head>
+
+<body>
+    <video controls muted loop preloaded style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%;">
+        <source src="/video" type="video/mp4" />
+    </video>
+
+    <script>
+        let video = document.querySelector('video');
+        let socket = io('http://localhost:30000');
+        let isMaster = false;
+
+        socket.on('connect', () => {
+            console.log(`connected to sync server`);
+        });
+
+        socket.on('master', () => {
+            isMaster = true;
+        });
+
+        socket.on('message', (msg) => {
+            let message = msg.split("=");
+
+            if (message[0] === "time") {
+                video.currentTime = message[1];
+                console.log(`synchronized video time remotely`);
+                return;
+            } 
+            
+            if (message[0] === "videoState") {
+                if(message[1] === "play") {
+                    video.play();
+                    console.log("resumed video remotely");
+
+                } else {
+                    video.pause();
+                    console.log("paused video remotely");
+                }
+                return;
+            }
+        });
+
+        setInterval(sync, 1000);
+
+        function sync() {
+            if(isMaster) {
+                socket.emit('sync', video.currentTime);
+                console.log("[MASTER] synced time with server");
+            }
+        }
+    </script>
+</body>
+
+</html>
