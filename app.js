@@ -76,13 +76,7 @@ io.sockets.on('connection', (socket) => {
         socket.emit('message', `videoState=play`);
 
     } else {
-        io.sockets.emit('message', `videoState=pause`);
-        frames.forEach(frame => {
-            if(frame != masterSocket) {
-                frame.emit('message', `time=${syncTime}`);
-            }
-        });
-        io.sockets.emit('message', `videoState=play`);
+	socket.emit('message', `time=${syncTime}`);
     }
 
     socket.on('sync', (currentTime) => {
@@ -107,12 +101,14 @@ io.sockets.on('connection', (socket) => {
 
 setInterval(sync, 15000);
 
-function sync() {
+function sync() {    
+    masterSocket.emit('message', 'videoState=pause');
     frames.forEach(frame => {
         if(frame != masterSocket) {
             frame.emit('message', `time=${syncTime + 0.63}`);
         }
     });
+    masterSocket.emit('message', 'videoState=play');
 }
 
 const stdin = process.openStdin();
