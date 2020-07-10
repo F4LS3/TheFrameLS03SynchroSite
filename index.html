@@ -24,12 +24,12 @@
         }
     </style>
 
-    <video muted loop preloaded>
+    <video controls muted loop preloaded>
         <source src="/video" type="video/mp4" />
     </video>
 
     <script>
-        let connectionIp = 'http://localhost:30000';
+        let connectionIp = 'http://192.168.145.65:30000';
         let video = document.querySelector('video');
         let socket = io(connectionIp);
         let isMaster = false;
@@ -49,8 +49,8 @@
                 video.currentTime = message[1];
                 console.log(`synchronized video time remotely`);
                 return;
-            } 
-            
+            }
+
             if (message[0] === "videoState") {
                 if(message[1] === "play") {
                     video.play();
@@ -63,6 +63,12 @@
                 return;
             }
         });
+
+        /*socket.on('reqSync', () => {
+            if(!isMaster) {
+                socket.emit('resSync', video.currentTime);
+            }
+        });*/
 
         setInterval(sync, 1000);
 
