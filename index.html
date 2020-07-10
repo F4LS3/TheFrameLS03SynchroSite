@@ -9,13 +9,29 @@
 </head>
 
 <body>
-    <video controls muted loop preloaded style="position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%;">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+        }
+    </style>
+
+    <video muted loop preloaded>
         <source src="/video" type="video/mp4" />
     </video>
 
     <script>
+        let connectionIp = 'http://localhost:30000';
         let video = document.querySelector('video');
-        let socket = io('http://localhost:30000');
+        let socket = io(connectionIp);
         let isMaster = false;
 
         socket.on('connect', () => {

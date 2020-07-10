@@ -5,6 +5,7 @@ const path = require("path");
 const express = require("express");
 const app = express();
 const socket = require("socket.io");
+const { SSL_OP_CISCO_ANYCONNECT } = require("constants");
 
 app.get("/video", (req, res) => {    
     const path = "./vid.mp4";
@@ -50,6 +51,7 @@ app.get("/video", (req, res) => {
 const port = 30000;
 let server = app.listen(port, () => {
     console.log("TheFrame LS03 SynchroServer started on port " + port);
+    console.log(`Open a browser on http://192.168.145.65:${port}`);
 });
 
 app.get("/", (req, res) => {
@@ -74,8 +76,13 @@ io.sockets.on('connection', (socket) => {
         socket.emit('message', `videoState=play`);
 
     } else {
-        socket.emit('message', `time=${syncTime + 0.2758}`);
-        socket.emit('message', `videoState=play`);
+        io.sockets.emit('message', `videoState=pause`);
+        frames.forEach(frame => {
+            if(frame != masterSocket) {
+                frame.emit('message', `time=${syncTime}`);
+            }
+        });
+        io.sockets.emit('message', `videoState=play`);
     }
 
     socket.on('sync', (currentTime) => {
@@ -83,17 +90,46 @@ io.sockets.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        if(socket == masterSocket) {
-            frames.splice(frames.indexOf(masterSocket), 1);
+        console.log(`Frame disconnected -> ${socket.id}`);
+        if(socket === masterSocket) {
             if(frames.length > 0) {
                 masterSocket = frames[frames.length - 1];
                 masterSocket.emit('master');
-            
+                
             } else {
                 masterSocket = null;
             }
-        } else {
-            frames.splice(frames.indexOf(socket), 1);
+        }
+
+        frames.splice(frames.indexOf(socket), 1);
+    });
+});
+
+setInterval(sync, 15000);
+
+function sync() {
+    frames.forEach(frame => {
+        if(frame != masterSocket) {
+            frame.emit('message', `time=${syncTime + 0.63}`);
         }
     });
+}
+
+const stdin = process.openStdin();
+stdin.addListener('data', (data) => {
+    const args = data.toString().replace("\r", "").replace("\n", "").split(" ");
+    
+    if(args[0] === "sync") {
+        if(masterSocket != null) {
+            console.log(`Synchronizing all frames from current given sync time (master=${masterSocket.id})`);
+            frames.forEach(frame => {
+                if(frame != masterSocket) {
+                    frame.emit('message', `time=${syncTime + 0.5}`);
+                }
+            });
+
+        } else {
+            console.log(`No master connection is active`);
+        }
+    }
 });
