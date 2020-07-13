@@ -24,7 +24,7 @@
         }
     </style>
 
-    <video controls muted loop preloaded>
+    <video autoplay controls muted loop>
         <source src="/video" type="video/mp4" />
     </video>
 
@@ -39,7 +39,11 @@
         });
 
         socket.on('master', () => {
-            isMaster = true;
+            if(isMaster) {
+                isMaster = false;
+            } else {
+                isMaster = true;
+            }
         });
 
         socket.on('message', (msg) => {
@@ -64,11 +68,10 @@
             }
         });
 
-        /*socket.on('reqSync', () => {
-            if(!isMaster) {
-                socket.emit('resSync', video.currentTime);
-            }
-        });*/
+        socket.on('reconnect', () => {
+            socket.close();
+            socket.connect();
+        });
 
         setInterval(sync, 1000);
 
@@ -82,3 +85,4 @@
 </body>
 
 </html>
+
