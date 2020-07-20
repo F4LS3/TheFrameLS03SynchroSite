@@ -1,0 +1,12 @@
+[
+    { "name": "FRAME-01", "video": "vid.mp4" },
+    { "name": "FRAME-02", "video": "vid.mp4" },
+    { "name": "FRAME-03", "video": "vid.mp4" },
+    { "name": "FRAME-04", "video": "vid.mp4" },
+    { "name": "FRAME-05", "video": "vid.mp4" },
+    { "name": "FRAME-06", "video": "vid.mp4" },
+    { "name": "FRAME-07", "video": "vid.mp4" },
+    { "name": "FRAME-08", "video": "vid.mp4" },
+    { "name": "FRAME-09", "video": "vid.mp4" },
+    { "name": "LOCALHOST", "video": "vid.mp4" }
+]

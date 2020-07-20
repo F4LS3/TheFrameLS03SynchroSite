@@ -1,12 +1,7 @@
 class Frame {
-    constructor(socket, ip, id) {
-        this._socket = socket;
+    constructor(ip, id) {
         this._ip = ip;
         this._id = id;
-    }
-
-    getSocket() {
-        return this._socket;
     }
 
     getIp() {

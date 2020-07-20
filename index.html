@@ -29,7 +29,7 @@
     </video>
 
     <script>
-        let connectionIp = 'http://192.168.145.65:30000';
+        let connectionIp = 'http://localhost:30000';
         let video = document.querySelector('video');
         let socket = io(connectionIp);
         let isMaster = false;
@@ -39,11 +39,7 @@
         });
 
         socket.on('master', () => {
-            if(isMaster) {
-                isMaster = false;
-            } else {
-                isMaster = true;
-            }
+            isMaster = !isMaster;
         });
 
         socket.on('message', (msg) => {
@@ -68,9 +64,8 @@
             }
         });
 
-        socket.on('reconnect', () => {
-            socket.close();
-            socket.connect();
+        socket.on('neuverbinden', () => {
+            location.reload();
         });
 
         setInterval(sync, 1000);
